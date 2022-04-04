@@ -2,7 +2,7 @@ include(CMakeParseArguments)
 
 function(add_external_package)
     # argument parsing
-    set(_add_external_package_opt EXACT FORCE)
+    set(_add_external_package_opt EXACT FORCE NO_RECURSE)
     set(_add_external_package_sval VERSION SOURCE_DIR)
     set(_add_external_package_mval CMAKE_ARGS)
     cmake_parse_arguments(
@@ -46,6 +46,11 @@ function(add_external_package)
     endif ()
     message(STATUS "Preparing local installation of ${_add_external_package_arg_NAME}")
 
+    # abort if recursion is not allowed
+    if (${AEP_NO_RECURSE})
+        message(FATAL_ERROR "add_external_package recursion is not allowed for ${_add_external_package_arg_NAME}")
+    endif ()
+
     # check if install config is present
     IF (NOT EXISTS "${_add_external_package_arg_SOURCE_DIR}/CMakeLists.txt")
         message(FATAL_ERROR "Cannot find ${_add_external_package_arg_SOURCE_DIR}/CMakeLists.txt")
@@ -59,6 +64,7 @@ function(add_external_package)
             COMMAND
             "${CMAKE_COMMAND}"
             ${_add_external_package_arg_CMAKE_ARGS}
+            "-DAEP_NO_RECURSE=${_add_external_package_arg_NO_RECURSE}"
             "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
             "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
             "-G"
