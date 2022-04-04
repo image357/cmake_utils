@@ -2,8 +2,8 @@ include(CMakeParseArguments)
 
 function(add_external_package)
     # argument parsing
-    set(_add_external_package_opt EXACT FORCE USE_CMAKE_INSTALL_PREFIX)
-    set(_add_external_package_sval VERSION SOURCE_DIR BUILD_DIR INSTALL_DIR)
+    set(_add_external_package_opt EXACT FORCE)
+    set(_add_external_package_sval VERSION SOURCE_DIR)
     set(_add_external_package_mval CMAKE_ARGS)
     cmake_parse_arguments(
             _add_external_package_arg
@@ -26,22 +26,10 @@ function(add_external_package)
         )
     endif ()
 
-    if ("${_add_external_package_arg_BUILD_DIR}" STREQUAL "")
-        set(
-                _add_external_package_arg_BUILD_DIR
-                "${CMAKE_CURRENT_BINARY_DIR}/_external/${_add_external_package_arg_NAME}/build"
-        )
-    endif ()
-
-    if ("${_add_external_package_arg_USE_CMAKE_INSTALL_PREFIX}" AND NOT "${_add_external_package_arg_INSTALL_DIR}" STREQUAL "")
-        message(FATAL_ERROR "Invalid argument combination of USE_CMAKE_INSTALL_PREFIX AND INSTALL_DIR")
-    endif ()
-    if (NOT "${_add_external_package_arg_USE_CMAKE_INSTALL_PREFIX}" AND "${_add_external_package_arg_INSTALL_DIR}" STREQUAL "")
-        set(
-                _add_external_package_arg_INSTALL_DIR
-                "${CMAKE_CURRENT_BINARY_DIR}/_external/${_add_external_package_arg_NAME}/install"
-        )
-    endif ()
+    set(
+            _add_external_package_arg_BUILD_DIR
+            "${CMAKE_CURRENT_BINARY_DIR}/_external/${_add_external_package_arg_NAME}"
+    )
 
     # check if package is already installed
     if (NOT "${_add_external_package_arg_FORCE}")
@@ -63,12 +51,21 @@ function(add_external_package)
         message(FATAL_ERROR "Cannot find ${_add_external_package_arg_SOURCE_DIR}/CMakeLists.txt")
     endif ()
 
-    # Configure the external package
+    # make build directory
     file(MAKE_DIRECTORY "${_add_external_package_arg_BUILD_DIR}")
+
+    # prepare CMAKE_PREFIX_PATH
+    if (NOT "${CMAKE_INSTALL_PREFIX}" IN_LIST CMAKE_PREFIX_PATH)
+        list(PREPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}")
+    endif ()
+
+    # Configure the external package
     execute_process(
             COMMAND
             "${CMAKE_COMMAND}"
             ${_add_external_package_arg_CMAKE_ARGS}
+            "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
+            "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
             "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
             "-G"
             "${CMAKE_GENERATOR}"
@@ -96,33 +93,19 @@ function(add_external_package)
     endif ()
 
     # Install the external package
-    if ("${_add_external_package_arg_INSTALL_DIR}" STREQUAL "")
-        execute_process(
-                COMMAND
-                "${CMAKE_COMMAND}"
-                "--install"
-                "${_add_external_package_arg_BUILD_DIR}"
-                RESULT_VARIABLE
-                _add_external_package_install_result
-        )
-    else ()
-        file(MAKE_DIRECTORY "${_add_external_package_arg_INSTALL_DIR}")
-        execute_process(
-                COMMAND
-                "${CMAKE_COMMAND}"
-                "--install"
-                "${_add_external_package_arg_BUILD_DIR}"
-                "--prefix"
-                "${_add_external_package_arg_INSTALL_DIR}"
-                RESULT_VARIABLE
-                _add_external_package_install_result
-        )
-        set("${_add_external_package_arg_NAME}_ROOT" ${_add_external_package_arg_INSTALL_DIR} PARENT_SCOPE)
-    endif ()
+    execute_process(
+            COMMAND
+            "${CMAKE_COMMAND}"
+            "--install"
+            "${_add_external_package_arg_BUILD_DIR}"
+            RESULT_VARIABLE
+            _add_external_package_install_result
+    )
     if (NOT ${_add_external_package_install_result} EQUAL 0)
         message(FATAL_ERROR "Cannot install external package")
     endif ()
 
     # done
+    set("${_add_external_package_arg_NAME}_ROOT" "${CMAKE_INSTALL_PREFIX}" PARENT_SCOPE)
     message(STATUS "Local installation of ${_add_external_package_arg_NAME} - done")
 endfunction()
