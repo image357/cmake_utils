@@ -76,7 +76,7 @@ function(add_external_package)
             _add_external_package_configure_result
     )
     if (NOT ${_add_external_package_configure_result} EQUAL 0)
-        message(FATAL_ERROR "Cannot configure external package")
+        message(FATAL_ERROR "Cannot configure external package ${_add_external_package_arg_NAME}")
     endif ()
 
     # Build the external package
@@ -89,7 +89,7 @@ function(add_external_package)
             _add_external_package_build_result
     )
     if (NOT ${_add_external_package_build_result} EQUAL 0)
-        message(FATAL_ERROR "Cannot build external package")
+        message(FATAL_ERROR "Cannot build external package ${_add_external_package_arg_NAME}")
     endif ()
 
     # Install the external package
@@ -102,7 +102,7 @@ function(add_external_package)
             _add_external_package_install_result
     )
     if (NOT ${_add_external_package_install_result} EQUAL 0)
-        message(FATAL_ERROR "Cannot install external package")
+        message(FATAL_ERROR "Cannot install external package ${_add_external_package_arg_NAME}")
     endif ()
 
     # done
