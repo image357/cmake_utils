@@ -54,18 +54,12 @@ function(add_external_package)
     # make build directory
     file(MAKE_DIRECTORY "${_add_external_package_arg_BUILD_DIR}")
 
-    # prepare CMAKE_PREFIX_PATH
-    if (NOT "${CMAKE_INSTALL_PREFIX}" IN_LIST CMAKE_PREFIX_PATH)
-        list(PREPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}")
-    endif ()
-
     # Configure the external package
     execute_process(
             COMMAND
             "${CMAKE_COMMAND}"
             ${_add_external_package_arg_CMAKE_ARGS}
             "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
-            "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
             "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
             "-G"
             "${CMAKE_GENERATOR}"
@@ -106,6 +100,5 @@ function(add_external_package)
     endif ()
 
     # done
-    set("${_add_external_package_arg_NAME}_ROOT" "${CMAKE_INSTALL_PREFIX}" PARENT_SCOPE)
     message(STATUS "Local installation of ${_add_external_package_arg_NAME} - done")
 endfunction()
