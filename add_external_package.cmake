@@ -31,6 +31,10 @@ function(add_external_package)
             "${CMAKE_CURRENT_BINARY_DIR}/_external/${_add_external_package_arg_NAME}"
     )
 
+    if (${_add_external_package_arg_NO_RECURSE})
+        list(APPEND _add_external_package_arg_CMAKE_ARGS "-DAEP_NO_RECURSE=${_add_external_package_arg_NO_RECURSE}")
+    endif ()
+
     # check if package is already installed
     if (NOT "${_add_external_package_arg_FORCE}")
         if (${_add_external_package_arg_EXACT})
@@ -64,7 +68,6 @@ function(add_external_package)
             COMMAND
             "${CMAKE_COMMAND}"
             ${_add_external_package_arg_CMAKE_ARGS}
-            "-DAEP_NO_RECURSE=${_add_external_package_arg_NO_RECURSE}"
             "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
             "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
             "-G"
