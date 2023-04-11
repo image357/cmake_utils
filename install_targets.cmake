@@ -1,3 +1,10 @@
+if (NOT DEFINED INSTALL_INCLUDEDIR)
+    set(INSTALL_INCLUDEDIR "include")
+endif ()
+if (NOT INSTALL_INCLUDEDIR MATCHES "/$")
+    set(INSTALL_INCLUDEDIR "${INSTALL_INCLUDEDIR}/")
+endif ()
+
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
@@ -19,7 +26,7 @@ install(
 )
 
 configure_package_config_file(
-        ${CMAKE_CURRENT_LIST_DIR}/installConfig.cmake.in
+        ${CMAKE_SOURCE_DIR}/cmake/installConfig.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}-${PROJECT_VERSION}
 )
@@ -38,7 +45,13 @@ install(
 )
 
 install(
-        DIRECTORY include/
+        DIRECTORY "${INSTALL_INCLUDEDIR}"
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}-${PROJECT_VERSION}
+        FILES_MATCHING PATTERN "*.hpp"
+)
+
+install(
+        DIRECTORY "${INSTALL_INCLUDEDIR}"
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}-${PROJECT_VERSION}
         FILES_MATCHING PATTERN "*.h"
 )
