@@ -70,3 +70,30 @@ foreach (INCDIR ${INSTALL_INCLUDEDIR})
             FILES_MATCHING PATTERN "*.h"
     )
 endforeach ()
+
+# install specific headers
+foreach (INCFILE ${INSTALL_INCLUDEFILE})
+    # split on seperator
+    string(REPLACE "->" ";" INCFILE "${INCFILE}")
+    list(LENGTH INCFILE INCFILE_LEN)
+
+    # prepare install destination path
+    set(INCLUDE_DESTINATION_SUBPATH "")
+    if (INCFILE_LEN EQUAL 2)
+        list(GET INCFILE 1 INCLUDE_DESTINATION_SUBPATH)
+        string(STRIP "${INCLUDE_DESTINATION_SUBPATH}" INCLUDE_DESTINATION_SUBPATH)
+    endif ()
+    cmake_path(SET INCLUDE_DESTINATION NORMALIZE "${CMAKE_INSTALL_INCLUDEDIR}/${INCLUDE_DESTINATION_SUBPATH}")
+    string(REGEX REPLACE "/$" "" INCLUDE_DESTINATION "${INCLUDE_DESTINATION}")
+
+    # prepare install source path
+    list(GET INCFILE 0 INCFILE)
+    string(STRIP "${INCFILE}" INCFILE)
+    cmake_path(SET INCFILE NORMALIZE "${INCFILE}")
+
+    install(
+            FILES
+            "${INCFILE}"
+            DESTINATION "${INCLUDE_DESTINATION}"
+    )
+endforeach ()
