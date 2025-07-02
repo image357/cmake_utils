@@ -51,13 +51,11 @@ foreach (INCDIR ${INSTALL_INCLUDEDIR})
     endif ()
     cmake_path(SET INCLUDE_DESTINATION NORMALIZE "${CMAKE_INSTALL_INCLUDEDIR}/${INCLUDE_DESTINATION_SUBPATH}")
     string(REGEX REPLACE "/$" "" INCLUDE_DESTINATION "${INCLUDE_DESTINATION}")
-    message(STATUS ${INCLUDE_DESTINATION})
 
     # prepare install source path
     list(GET INCDIR 0 INCDIR)
     string(STRIP "${INCDIR}" INCDIR)
     cmake_path(SET INCDIR NORMALIZE "${INCDIR}/")
-    message(STATUS ${INCDIR})
 
     # install directories
     install(
