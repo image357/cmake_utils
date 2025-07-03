@@ -14,7 +14,7 @@
 #        "some/path/to/file.h" # install file.h to ${CMAKE_INSTALL_INCLUDEDIR}/file.h
 #        "another/path/to/file.h -> foo/bar" # install file.h to ${CMAKE_INSTALL_INCLUDEDIR}/foo/bar/file.h
 #)
-## this is mandatory
+## this is mandatory - execute script on the defined variables
 #include(install_targets.cmake)
 # ----------------------------------------------------------------------------------------------------
 
