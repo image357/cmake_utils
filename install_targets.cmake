@@ -1,3 +1,23 @@
+# INFO: example usage
+# ----------------------------------------------------------------------------------------------------
+## this is mandatory
+#set(INSTALL_TARGETS local_target1 local_target2)
+## this is optional - default include dir will be ${CMAKE_SOURCE_DIR}/include
+#set(
+#        INSTALL_INCLUDEDIR
+#        "src" # copy all headers in src to ${CMAKE_INSTALL_INCLUDEDIR}
+#        "some/path -> another/path" # copy all headers in some/path to ${CMAKE_INSTALL_INCLUDEDIR}/another/path
+#)
+## this is optional
+#set(
+#        INSTALL_INCLUDEFILE
+#        "some/path/to/file.h" # install file.h to ${CMAKE_INSTALL_INCLUDEDIR}/file.h
+#        "another/path/to/file.h -> foo/bar" # install file.h to ${CMAKE_INSTALL_INCLUDEDIR}/foo/bar/file.h
+#)
+## this is mandatory
+#include(install_targets.cmake)
+# ----------------------------------------------------------------------------------------------------
+
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
