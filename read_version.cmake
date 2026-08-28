@@ -125,9 +125,13 @@ function(enforce_git_version_consistency VERSION)
 
     # enforce
     if (${arg_NO_FORCE})
-        message(WARNING "enforce_git_version_consistency: git branch or tag version is not compatible with ${VERSION}")
+        if (NOT ("${FIND_RESULT}" EQUAL -1))
+            message(WARNING "enforce_git_version_consistency: git branch or tag version (${GIT_RELEASE_VERSIONS}) is not compatible with ${VERSION}")
+        endif ()
     else ()
-        message(FATAL_ERROR "enforce_git_version_consistency: git branch or tag version is not compatible with ${VERSION}")
+        if (NOT ("${FIND_RESULT}" EQUAL -1))
+            message(FATAL_ERROR "enforce_git_version_consistency: git branch or tag version (${GIT_RELEASE_VERSIONS}) is not compatible with ${VERSION}")
+        endif ()
     endif ()
 endfunction()
 
@@ -193,6 +197,7 @@ function(check_version_compatability VERSION1 VERSION2 RESULT_VAR)
         endif ()
     endif ()
 endfunction()
+
 
 get_version_from_file(TEXT_VERSION)
 set(
