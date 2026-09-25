@@ -197,11 +197,50 @@ function(check_version_compatability VERSION1 VERSION2 RESULT_VAR)
 endfunction()
 
 
-get_version_from_file(TEXT_VERSION)
-set(
-        VERSION
-        ${TEXT_VERSION}
-        CACHE
-        STRING
-        "Version number of this project. Usually read from \"VERSION\" file in the root of this project."
-)
+function(get_git_commit_hash RESULT_VAR)
+    # argument parsing
+    set(options SHORT)
+    set(oneValueArgs "")
+    set(multiValueArgs "")
+    cmake_parse_arguments(
+            arg
+            "${options}"
+            "${oneValueArgs}"
+            "${multiValueArgs}"
+            ${ARGN}
+    )
+
+    list(LENGTH arg_UNPARSED_ARGUMENTS ualen)
+    if (NOT ("${ualen}" EQUAL 0))
+        message(FATAL_ERROR "argument error in get_git_commit_hash")
+    endif ()
+
+    find_package(Git)
+    if (${Git_FOUND})
+        execute_process(
+                COMMAND git rev-parse --is-inside-work-tree
+                WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+                OUTPUT_VARIABLE IS_GIT_REPO
+                ERROR_VARIABLE IS_GIT_REPO_ERROR_TEXT
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        if ("${IS_GIT_REPO}" STREQUAL "true")
+            if (${arg_SHORT})
+                execute_process(
+                        COMMAND git rev-parse --short HEAD
+                        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+                        OUTPUT_VARIABLE GIT_COMMIT_HASH
+                        OUTPUT_STRIP_TRAILING_WHITESPACE
+                )
+            else ()
+                execute_process(
+                        COMMAND git rev-parse --verify HEAD
+                        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+                        OUTPUT_VARIABLE GIT_COMMIT_HASH
+                        OUTPUT_STRIP_TRAILING_WHITESPACE
+                )
+            endif ()
+        endif ()
+    endif ()
+    set(${RESULT_VAR} "${GIT_COMMIT_HASH}" PARENT_SCOPE)
+endfunction()
